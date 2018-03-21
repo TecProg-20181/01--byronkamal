@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 typedef struct _pixel {
-    unsigned short int red
+    unsigned short int red;
     unsigned short int green;
     unsigned short int blue;
 } Pixel;
@@ -54,14 +54,14 @@ Image escala_de_cinza(Image img) {
     return img;
 }
 
-void blur(unsigned int h, unsigned short int pixel[512][512][3], int T, unsigned int w) {
-    for (unsigned int i = 0; i < h; ++i) {
-        for (unsigned int j = 0; j < w; ++j) {
+void blur(unsigned int height, unsigned short int pixel[512][512][3], int T, unsigned int width) {
+    for (unsigned int i = 0; i < height; ++i) {
+        for (unsigned int j = 0; j < width; ++j) {
             Pixel media = {0, 0, 0};
 
-            int menor_height = (height - 1 > i + T/2) ? i + T/2 : h - 1;
-            int min_width = (width - 1 > j + T/2) ? j + T/2 : w - 1;
-            for(int x = (0 > i - T/2 ? 0 : i - T/2); x <= menor_h; ++x) {
+            int menor_height = (height - 1 > i + T/2) ? i + T/2 : height - 1;
+            int min_width = (width - 1 > j + T/2) ? j + T/2 : width - 1;
+            for(int x = (0 > i - T/2 ? 0 : i - T/2); x <= menor_height; ++x) {
                 for(int y = (0 > j - T/2 ? 0 : j - T/2); y <= min_width; ++y) {
                     media.red += pixel[x][y][0];
                     media.green += pixel[x][y][1];
@@ -100,8 +100,8 @@ Image rotacionar90direita(Image img) {
 
 void inverter_cores(unsigned short int pixel[512][512][3],
                     unsigned int width, unsigned int height) {
-    for (unsigned int i = 0; i < h; ++i) {
-        for (unsigned int j = 0; j < w; ++j) {
+    for (unsigned int i = 0; i < height; ++i) {
+        for (unsigned int j = 0; j < width; ++j) {
             pixel[i][j][0] = 255 - pixel[i][j][0];
             pixel[i][j][1] = 255 - pixel[i][j][1];
             pixel[i][j][2] = 255 - pixel[i][j][2];
@@ -109,14 +109,14 @@ void inverter_cores(unsigned short int pixel[512][512][3],
     }
 }
 
-Image cortar_imagem(Image img, int x, int y, int w, int h) {
+Image cortar_imagem(Image img, int x, int y, int width, int height) {
     Image cortada;
 
     cortada.width = width;
     cortada.height = height;
 
-    for(int i = 0; i < h; ++i) {
-        for(int j = 0; j < w; ++j) {
+    for(int i = 0; i < height; ++i) {
+        for(int j = 0; j < width; ++j) {
             cortada.pixel[i][j][0] = img.pixel[i + y][j + x][0];
             cortada.pixel[i][j][1] = img.pixel[i + y][j + x][1];
             cortada.pixel[i][j][2] = img.pixel[i + y][j + x][2];
@@ -126,6 +126,42 @@ Image cortar_imagem(Image img, int x, int y, int w, int h) {
     return cortada;
 }
 
+Image sepia(Image img) {
+for (unsigned int x = 0; x < img.height; ++x) {
+    for (unsigned int j = 0; j < img.width; ++j) {
+        unsigned short int pixel[3];
+        pixel[0] = img.pixel[x][j][0];
+        pixel[1] = img.pixel[x][j][1];
+        pixel[2] = img.pixel[x][j][2];
+
+        int p =  pixel[0] * .393 + pixel[1] * .769 + pixel[2] * .189;
+        int menor_r = (255 >  p) ? p : 255;
+        img.pixel[x][j][0] = menor_r;
+
+        p =  pixel[0] * .349 + pixel[1] * .686 + pixel[2] * .168;
+        menor_r = (255 >  p) ? p : 255;
+        img.pixel[x][j][1] = menor_r;
+
+        p =  pixel[0] * .272 + pixel[1] * .534 + pixel[2] * .131;
+        menor_r = (255 >  p) ? p : 255;
+        img.pixel[x][j][2] = menor_r;
+      }
+    }
+
+    return img;
+}
+
+Image read_pixel(Image img) {
+for (unsigned int i = 0; i < img.height; ++i) {
+    for (unsigned int j = 0; j < img.width; ++j) {
+        scanf("%hu %hu %hu", &img.pixel[i][j][0],
+                             &img.pixel[i][j][1],
+                             &img.pixel[i][j][2]);
+    }
+  }
+
+  return img;
+}
 
 int main() {
     Image img;
@@ -139,14 +175,7 @@ int main() {
     scanf("%u %u %d", &img.width, &img.height, &max_color);
 
     // read all pixels of image
-    for (unsigned int i = 0; i < img.height; ++i) {
-        for (unsigned int j = 0; j < img.width; ++j) {
-            scanf("%hu %hu %hu", &img.pixel[i][j][0],
-                                 &img.pixel[i][j][1],
-                                 &img.pixel[i][j][2]);
-
-        }
-    }
+    img = read_pixel(img);
 
     int n_opcoes;
     scanf("%d", &n_opcoes);
@@ -161,29 +190,10 @@ int main() {
                 break;
             }
             case 2: { // Filtro Sepia
-                for (unsigned int x = 0; x < img.height; ++x) {
-                    for (unsigned int j = 0; j < img.width; ++j) {
-                        unsigned short int pixel[3];
-                        pixel[0] = img.pixel[x][j][0];
-                        pixel[1] = img.pixel[x][j][1];
-                        pixel[2] = img.pixel[x][j][2];
-
-                        int p =  pixel[0] * .393 + pixel[1] * .769 + pixel[2] * .189;
-                        int menor_r = (255 >  p) ? p : 255;
-                        img.pixel[x][j][0] = menor_r;
-
-                        p =  pixel[0] * .349 + pixel[1] * .686 + pixel[2] * .168;
-                        menor_r = (255 >  p) ? p : 255;
-                        img.pixel[x][j][1] = menor_r;
-
-                        p =  pixel[0] * .272 + pixel[1] * .534 + pixel[2] * .131;
-                        menor_r = (255 >  p) ? p : 255;
-                        img.pixel[x][j][2] = menor_r;
-                    }
+                img = sepia(img);
                 }
 
                 break;
-            }
             case 3: { // Blur
                 int tamanho = 0;
                 scanf("%d", &tamanho);
@@ -203,13 +213,13 @@ int main() {
                 int horizontal = 0;
                 scanf("%d", &horizontal);
 
-                int w = img.width, h = img.height;
+                int width = img.width, height = img.height;
 
                 if (horizontal == 1) width /= 2;
                 else height /= 2;
 
-                for (int i2 = 0; i2 < h; ++i2) {
-                    for (int j = 0; j < w; ++j) {
+                for (int i2 = 0; i2 < height; ++i2) {
+                    for (int j = 0; j < width; ++j) {
                         int x = i2, y = j;
 
                         if (horizontal == 1) y = img.width - 1 - j;
