@@ -238,7 +238,7 @@ int main() {
             case 7: { // Cortar Imagem
                 int x, y;
                 scanf("%d %d", &x, &y);
-                int w, h;
+                int width, height;
                 scanf("%d %d", &width, &height);
 
                 img = cortar_imagem(img, x, y, width, height);
