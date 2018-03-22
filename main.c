@@ -17,11 +17,6 @@ typedef struct _image {
 } Image;
 
 Image escala_de_cinza(Image img) {
-    /*for (unsigned int i = 0; i < img.h; ++i) {
-        for (unsigned int j = 0; j < img.w; ++j) {
-            print("%u", img.pixel[i][j][0] + img.pixel[i][j][1] + img.pixel[i][j][2]);
-        }
-    }*/
 
     for (unsigned int i = 0; i < img.height; ++i) {
         for (unsigned int j = 0; j < img.width; ++j) {
