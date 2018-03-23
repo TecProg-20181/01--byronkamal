@@ -6,6 +6,20 @@ typedef struct _pixel {
     unsigned short int blue;
 } Pixel;
 
+int max(int a, int b) {
+      if (a > b)
+        return a;
+      return b;
+}
+
+int min(int a, int b) {
+  if (b > a) {
+    return b;
+    }
+    
+  return a;
+}
+
 typedef struct _image {
     // [width][height][rgb]
     // 0 -> r
@@ -38,7 +52,7 @@ void blur(unsigned int height, unsigned short int pixel[512][512][3], int T, uns
         for (unsigned int j = 0; j < width; ++j) {
             Pixel media = {0, 0, 0};
 
-            int menor_height = (height - 1 > i + T/2) ? i + T/2 : height - 1;
+            int menor_height = max(height,T);
             int min_width = (width - 1 > j + T/2) ? j + T/2 : width - 1;
             for(int x = (0 > i - T/2 ? 0 : i - T/2); x <= menor_height; ++x) {
                 for(int y = (0 > j - T/2 ? 0 : j - T/2); y <= min_width; ++y) {
